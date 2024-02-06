@@ -36,6 +36,7 @@ def validate(val_dataloader, trainer) -> float:
 
     with torch.no_grad():
         for x, y in val_dataloader:
+            print(x.shape)
             x = x.to(trainer.device)
             y = y.to(trainer.device)
             in_seq = x[:, : val_dataloader.dataset.pad_size]
@@ -44,13 +45,7 @@ def validate(val_dataloader, trainer) -> float:
                 in_seq, val_dataloader.dataset.output_pad_size, do_sample=False
             )  # using greedy argmax, not sampling
             preds = [
-                "".join(
-                    Vocab.detokenise(
-                        Vocab.unpad(
-                            x.cpu().detach().numpy()[val_dataloader.dataset.pad_size :]
-                        )
-                    )
-                )
+                "".join(Vocab.detokenise(Vocab.unpad(x.cpu().detach().numpy())))
                 for x in out
             ]
             target = [
@@ -61,9 +56,7 @@ def validate(val_dataloader, trainer) -> float:
             cer(preds, target)
 
             for xx, yy in zip(preds, target):
-                pprint(xx)
-                pprint(yy)
-                pprint("* * * * * * * * * * * * * * * * * * * * * * * * * * * * ")
+                pprint(f"Prediction: {xx} | Target: {yy}")
             break
     trainer.model.train()
 
