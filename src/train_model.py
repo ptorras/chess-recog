@@ -42,8 +42,14 @@ def validate(val_dataloader, trainer) -> float:
             out = trainer.model.generate(
                 in_seq, val_dataloader.dataset.output_pad_size, do_sample=False
             )  # using greedy argmax, not sampling
-            preds = ["".join(Vocab.detokenise(Vocab.unpad(x))) for x in out]
-            target = ["".join(Vocab.detokenise(Vocab.unpad(x))) for x in out_seq]
+            preds = [
+                "".join(Vocab.detokenise(Vocab.unpad(x.cpu().detach().numpy())))
+                for x in out
+            ]
+            target = [
+                "".join(Vocab.detokenise(Vocab.unpad(x.cpu().detach().numpy())))
+                for x in out_seq
+            ]
 
             cer(preds, target)
     trainer.model.train()
