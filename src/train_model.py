@@ -16,6 +16,10 @@ def create_model():
     return model
 
 
+def on_batch_end_callback(trainer):
+    print({"loss": trainer.loss})
+
+
 def main():
     model = create_model()
     dataset = ChessBoardData("./data/data.json", 100, 10)
@@ -26,6 +30,7 @@ def main():
     train_config.batch_size = 32
 
     trainer = Trainer(train_config, model, dataset)
+    trainer.set_callback("on_batch_end", on_batch_end_callback)
     trainer.run()
 
 

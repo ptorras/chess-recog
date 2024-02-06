@@ -62,6 +62,5 @@ class ChessBoardData(D.Dataset):
             sample["fen"] + sample["pre"] + sample["real"],
             self.pad_size + self.output_pad_size,
         )
-        print(padded)
 
         return padded[:-1], padded[1:]
