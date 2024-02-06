@@ -40,12 +40,18 @@ def validate(val_dataloader, trainer) -> float:
             x = x.to(trainer.device)
             y = y.to(trainer.device)
             in_seq = x[:, : val_dataloader.dataset.pad_size]
-            out_seq = y[:, val_dataloader.dataset.pad_size :]
+            out_seq = y[:, val_dataloader.dataset.pad_size - 1 :]
             out = trainer.model.generate(
                 in_seq, val_dataloader.dataset.output_pad_size, do_sample=False
             )  # using greedy argmax, not sampling
             preds = [
-                "".join(Vocab.detokenise(Vocab.unpad(x.cpu().detach().numpy())))
+                "".join(
+                    Vocab.detokenise(
+                        Vocab.unpad(
+                            x.cpu().detach().numpy()[: val_dataloader.dataset.pad_size]
+                        )
+                    )
+                )
                 for x in out
             ]
             target = [
