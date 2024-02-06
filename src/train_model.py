@@ -48,7 +48,7 @@ def validate(val_dataloader, trainer) -> float:
                 "".join(
                     Vocab.detokenise(
                         Vocab.unpad(
-                            x.cpu().detach().numpy()[: val_dataloader.dataset.pad_size]
+                            x.cpu().detach().numpy()[val_dataloader.dataset.pad_size :]
                         )
                     )
                 )
