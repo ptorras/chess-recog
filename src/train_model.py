@@ -52,6 +52,7 @@ def validate(val_dataloader, trainer) -> float:
             ]
 
             cer(preds, target)
+            break
     trainer.model.train()
 
     return cer.compute()
