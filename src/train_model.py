@@ -13,7 +13,7 @@ import torch
 
 def create_model():
     model_config = GPT.get_default_config()
-    model_config.model_type = "gpt2"
+    model_config.model_type = "gpt-micro"
     model_config.vocab_size = Vocab.length()
     model_config.block_size = 1024
     model = GPT(model_config)
@@ -65,7 +65,7 @@ def validate(val_dataloader, trainer) -> float:
             break
     trainer.model.train()
 
-    return cer.compute()
+    return float(cer.compute())
 
 
 def main():
