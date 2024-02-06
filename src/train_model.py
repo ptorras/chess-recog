@@ -6,6 +6,7 @@ from mingpt.model import GPT
 from mingpt.trainer import Trainer
 
 from torchmetrics.text import CharErrorRate
+from pprint import pprint
 
 import torch
 
@@ -52,6 +53,8 @@ def validate(val_dataloader, trainer) -> float:
             ]
 
             cer(preds, target)
+            pprint(preds)
+            pprint(target)
             break
     trainer.model.train()
 
@@ -75,7 +78,7 @@ def main():
 
     train_config = Trainer.get_default_config()
     train_config.learning_rate = 5e-4  # many possible options, see the file
-    train_config.max_iters = 1000
+    train_config.max_iters = 10 * len(dataset)
     train_config.batch_size = 32
 
     trainer = Trainer(train_config, model, dataset)
