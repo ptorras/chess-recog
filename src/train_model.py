@@ -23,9 +23,9 @@ def create_model():
 def on_batch_end_callback(val_dataloader, trainer):
     print({"loss": trainer.loss})
 
-    if trainer.iter_num % 1000 == 0:
+    if trainer.iter_num % 100 == 0:
         error = validate(val_dataloader, trainer)
-        torch.save(trainer.model, "./checkpoints/saved_pp.pth")
+        torch.save(trainer.model.state_dict(), "./saved_pp.pth")
         print({"validation_error": error})
 
 
