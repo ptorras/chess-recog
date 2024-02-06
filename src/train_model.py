@@ -5,6 +5,10 @@ from dataset import ChessBoardData, Vocab
 from mingpt.model import GPT
 from mingpt.trainer import Trainer
 
+from torchmetrics.text import CharErrorRate
+
+import torch
+
 
 def create_model():
     model_config = GPT.get_default_config()
@@ -16,13 +20,49 @@ def create_model():
     return model
 
 
-def on_batch_end_callback(trainer):
+def on_batch_end_callback(val_dataloader, trainer):
     print({"loss": trainer.loss})
+
+    if trainer.iter_num % 1000 == 0:
+        error = validate(val_dataloader, trainer)
+        torch.save(trainer.model, "./checkpoints/saved_pp.pth")
+        print({"validation_error": error})
+
+
+def validate(val_dataloader, trainer) -> float:
+    trainer.model.eval()
+    cer = CharErrorRate()
+
+    with torch.no_grad():
+        for x, y in val_dataloader:
+            in_seq = x[:, val_dataloader.dataset.pad_size]
+            out_seq = y[:, val_dataloader.dataset.output_pad_size]
+            out = trainer.model.generate(
+                in_seq, val_dataloader.dataset.output_pad_size, do_sample=False
+            )  # using greedy argmax, not sampling
+            preds = ["".join(Vocab.detokenise(Vocab.unpad(x))) for x in out]
+            target = ["".join(Vocab.detokenise(Vocab.unpad(x))) for x in out_seq]
+
+            cer(preds, target)
+    trainer.model.train()
+
+    return cer.compute()
 
 
 def main():
     model = create_model()
     dataset = ChessBoardData("./data/data.json", 100, 10)
+    val_dataset = ChessBoardData("./data/data.json", 100, 10)
+    val_dataloader = torch.utils.data.DataLoader(
+        val_dataset,
+        sampler=torch.utils.data.RandomSampler(
+            val_dataset, replacement=True, num_samples=int(1e10)
+        ),
+        shuffle=False,
+        pin_memory=True,
+        batch_size=32,
+        num_workers=8,
+    )
 
     train_config = Trainer.get_default_config()
     train_config.learning_rate = 5e-4  # many possible options, see the file
@@ -30,7 +70,9 @@ def main():
     train_config.batch_size = 32
 
     trainer = Trainer(train_config, model, dataset)
-    trainer.set_callback("on_batch_end", on_batch_end_callback)
+    trainer.set_callback(
+        "on_batch_end", lambda x: on_batch_end_callback(val_dataloader, x)
+    )
     trainer.run()
 
 

@@ -12,8 +12,8 @@ from numpy.typing import ArrayLike
 class Vocab:
     """Implements switching back and forth between tokens."""
 
-    TOKEN2INDEX = {token: ii for ii, token in enumerate(string.printable)}
-    INDEX2TOKEN = {ii: token for ii, token in enumerate(string.printable)}
+    TOKEN2INDEX = {token: ii for ii, token in enumerate("\r" + string.printable)}
+    INDEX2TOKEN = {ii: token for ii, token in enumerate("\r" + string.printable)}
 
     @classmethod
     def tokenise(cls, inp: str) -> List[int]:
@@ -25,6 +25,14 @@ class Vocab:
         padded[: len(inp)] = inp
 
         return padded
+
+    @classmethod
+    def unpad(cls, inp: ArrayLike) -> List[int]:
+        return [x for x in inp if x != 0]
+
+    @classmethod
+    def detokenise(cls, inp: List[int]) -> str:
+        return "".join(cls.INDEX2TOKEN[x] for x in inp)
 
     @classmethod
     def length(cls) -> int:
@@ -58,9 +66,14 @@ class ChessBoardData(D.Dataset):
 
     def __getitem__(self, index: int) -> Tuple[ArrayLike, ArrayLike]:
         sample = self.data[index]
-        padded = Vocab.pad(
-            sample["fen"] + sample["pre"] + sample["real"],
-            self.pad_size + self.output_pad_size,
+        padded = np.zeros(self.pad_size + self.output_pad_size, dtype=int)
+        padded[: self.pad_size] = Vocab.pad(
+            sample["fen"] + sample["pre"],
+            self.pad_size,
+        )
+        padded[self.pad_size :] = Vocab.pad(
+            sample["real"],
+            self.output_pad_size,
         )
 
         return padded[:-1], padded[1:]
