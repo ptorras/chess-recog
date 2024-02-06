@@ -3,7 +3,7 @@ import json
 import string
 
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Callable
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -39,11 +39,31 @@ class Vocab:
         return len(cls.TOKEN2INDEX)
 
 
+def augment_output(val: str) -> str:
+    ...
+
+
+SIMILAR = {
+    "C": ["(", "c", "/", "["],
+}
+
+
+def similar_elements(val: str) -> str:
+    ...
+
+
 class ChessBoardData(D.Dataset):
-    def __init__(self, path: Path, pad_size: int, output_pad_size: int) -> None:
+    def __init__(
+        self,
+        path: Path,
+        pad_size: int,
+        output_pad_size: int,
+        augmentation: Callable[[str], str] | None = None,
+    ) -> None:
         self.path = path
         self.pad_size = pad_size
         self.output_pad_size = output_pad_size
+        self.augmentation = augmentation
 
         with open(path, "r", encoding="utf8") as f_in:
             data = json.load(f_in)
@@ -52,7 +72,7 @@ class ChessBoardData(D.Dataset):
             {
                 "fen": Vocab.tokenise(x["fen"]),
                 "real": Vocab.tokenise(x["real"]),
-                "pre": Vocab.tokenise(x["pre"]),
+                "pre": x["pre"],
                 "og_fen_len": len(x["fen"]),
                 "og_real_len": len(x["real"]),
                 "og_predicted_len": len(x["pre"]),
@@ -67,8 +87,12 @@ class ChessBoardData(D.Dataset):
     def __getitem__(self, index: int) -> Tuple[ArrayLike, ArrayLike]:
         sample = self.data[index]
         padded = np.zeros(self.pad_size + self.output_pad_size, dtype=int)
+        pred = sample["pre"]
+        if self.augmentation is not None:
+            pred = self.augmentation(pred)
+        pred_string = Vocab.tokenise(pred)
         padded[: self.pad_size] = Vocab.pad(
-            sample["fen"] + sample["pre"],
+            sample["fen"] + pred_string,
             self.pad_size,
         )
         padded[self.pad_size :] = Vocab.pad(
