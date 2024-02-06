@@ -58,11 +58,10 @@ class ChessBoardData(D.Dataset):
 
     def __getitem__(self, index: int) -> Tuple[ArrayLike, ArrayLike]:
         sample = self.data[index]
-        padded = (
-            Vocab.pad(
-                sample["fen"] + sample["pre"] + sample["real"],
-                self.pad_size + self.output_pad_size,
-            ),
+        padded = Vocab.pad(
+            sample["fen"] + sample["pre"] + sample["real"],
+            self.pad_size + self.output_pad_size,
         )
+        print(padded)
 
         return padded[:-1], padded[1:]
