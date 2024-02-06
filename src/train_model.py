@@ -35,8 +35,10 @@ def validate(val_dataloader, trainer) -> float:
 
     with torch.no_grad():
         for x, y in val_dataloader:
+            x = x.to(trainer.device)
+            y = y.to(trainer.device)
             in_seq = x[:, : val_dataloader.dataset.pad_size]
-            out_seq = y[:, val_dataloader.dataset.output_pad_size :]
+            out_seq = y[:, val_dataloader.dataset.pad_size :]
             out = trainer.model.generate(
                 in_seq, val_dataloader.dataset.output_pad_size, do_sample=False
             )  # using greedy argmax, not sampling
