@@ -36,7 +36,6 @@ def validate(val_dataloader, trainer) -> float:
 
     with torch.no_grad():
         for x, y in val_dataloader:
-            print(x.shape)
             x = x.to(trainer.device)
             y = y.to(trainer.device)
             in_seq = x[:, : val_dataloader.dataset.pad_size]
@@ -44,6 +43,7 @@ def validate(val_dataloader, trainer) -> float:
             out = trainer.model.generate(
                 in_seq, val_dataloader.dataset.output_pad_size, do_sample=False
             )  # using greedy argmax, not sampling
+            print(out[0])
             preds = [
                 "".join(
                     Vocab.detokenise(
