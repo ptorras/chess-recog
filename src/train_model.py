@@ -44,7 +44,13 @@ def validate(val_dataloader, trainer) -> float:
                 in_seq, val_dataloader.dataset.output_pad_size, do_sample=False
             )  # using greedy argmax, not sampling
             preds = [
-                "".join(Vocab.detokenise(Vocab.unpad(x.cpu().detach().numpy())))
+                "".join(
+                    Vocab.detokenise(
+                        Vocab.unpad(
+                            x.cpu().detach().numpy()[val_dataloader.dataset.pad_size :]
+                        )
+                    )
+                )
                 for x in out
             ]
             target = [
@@ -53,8 +59,11 @@ def validate(val_dataloader, trainer) -> float:
             ]
 
             cer(preds, target)
-            pprint(preds)
-            pprint(target)
+
+            for xx, yy in zip(preds, target):
+                pprint(xx)
+                pprint(yy)
+                pprint("* * * * * * * * * * * * * * * * * * * * * * * * * * * * ")
             break
     trainer.model.train()
 
