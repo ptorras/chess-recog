@@ -4,6 +4,7 @@ def is_close(p1, p2, threshold=5):
     else:
         return False
 
+# x, y, w, h
 def sortBB(BB):
     BB.sort(key=lambda x: x[1])
 
@@ -20,7 +21,6 @@ def sortBB(BB):
     BB = BB_copy
     return BB
 
-# bb_intersection_over_union()
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
@@ -54,7 +54,7 @@ import numpy as np
 
 # open the imge
 
-def extractTables(img):
+def extractTables(img, proccessed):
     # convert to gray
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
@@ -78,12 +78,14 @@ def extractTables(img):
     bb.sort(key=lambda x: x[0])
 
     imgs = []
+    proccessed_imgs = []
     for b in bb:
         x, y, w, h = b
         imgs.append(img[y:y+h, x:x+w])
+        proccessed_imgs.append(proccessed[y:y+h, x:x+w])
 
-    return imgs
-def extractSquares(img_grid):
+    return imgs, proccessed_imgs
+def extractSquares(img_grid, final_img):
     gray = cv2.cvtColor(img_grid, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     cnts = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -135,17 +137,21 @@ def extractSquares(img_grid):
         imgs = []
         for bb in BB:
             x, y, w, h = bb
-            imgs.append(img[y:y+h, x:x+w])
+            imgs.append(final_img[y:y+h, x:x+w])
         
     return imgs
 
 import os 
 def findAllSquares(img):
     all_squares = []
-    img = cv2.imread(os.path.join(root, file))
-    imgs = extractTables(img)
-    for img in imgs:
-        all_squares.append(extractSquares(img))
+    
+    gray_result = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    thr = cv2.adaptiveThreshold(gray_result, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 19, 4)
+    blur = cv2.GaussianBlur(thr, (7, 7), 0)
+    ret3, thr = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    imgs, processed = extractTables(img, thr)
+    for img, proc in zip(imgs, processed):
+        all_squares.append(extractSquares(img, proc))
         plt.figure(figsize=(20, 20))
         plt.imshow(all_squares[-1][-1])
         plt.show()
