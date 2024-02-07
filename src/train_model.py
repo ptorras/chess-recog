@@ -70,7 +70,9 @@ def validate(val_dataloader, trainer) -> float:
 
 def main():
     model = create_model()
-    dataset = ChessBoardData("./data/data.json", 100, 10, augment_output)
+    dataset = ChessBoardData(
+        "/data2fast/users/GROUP01/data_full.json", 100, 10, augment_output
+    )
     val_dataset = ChessBoardData("./data/data.json", 100, 10)
     val_dataloader = torch.utils.data.DataLoader(
         val_dataset,
