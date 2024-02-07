@@ -73,7 +73,7 @@ def main():
     dataset = ChessBoardData(
         "/data2fast/users/GROUP01/data_full.json", 100, 10, augment_output
     )
-    val_dataset = ChessBoardData("./data/data.json", 100, 10)
+    val_dataset = ChessBoardData("./data/data.json", 100, 10, augment_output)
     val_dataloader = torch.utils.data.DataLoader(
         val_dataset,
         sampler=torch.utils.data.RandomSampler(
