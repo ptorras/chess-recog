@@ -1,7 +1,7 @@
 import torch
 
 
-from dataset import ChessBoardData, Vocab
+from dataset import ChessBoardData, Vocab, augment_output
 from mingpt.model import GPT
 from mingpt.trainer import Trainer
 
@@ -70,7 +70,7 @@ def validate(val_dataloader, trainer) -> float:
 
 def main():
     model = create_model()
-    dataset = ChessBoardData("./data/data.json", 100, 10)
+    dataset = ChessBoardData("./data/data.json", 100, 10, augment_output)
     val_dataset = ChessBoardData("./data/data.json", 100, 10)
     val_dataloader = torch.utils.data.DataLoader(
         val_dataset,

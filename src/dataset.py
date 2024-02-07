@@ -41,7 +41,15 @@ class Vocab:
 
 
 def augment_output(val: str) -> str:
-    ...
+    values = list(val)
+    if random.random() > 0.5:
+        values = random_insert(values)
+    if random.random() > 0.5:
+        values = random_substitution(values)
+    if random.random() > 0.5:
+        values = random_case(values)
+
+    return "".join(values)
 
 
 SIMILAR = {
@@ -50,17 +58,30 @@ SIMILAR = {
 }
 
 
-def random_noise(val: str) -> str:
-    if random.random() > 0.5:
-        letters = list(val)
-        for chr in iter(random.sample(ascii_letters)):
-            ...
-    else:
-        return val
-
-
-def similar_elements(val: str) -> str:
+def similar_elements(val: List[str]) -> List[str]:
     ...
+
+
+def random_insert(val: List[str]) -> List[str]:
+    index = random.randint(0, len(val) + 1)
+    rchindex = random.randint(0, len(printable))
+    randchar = printable[rchindex]
+    val.insert(index, randchar)
+    return val
+
+
+def random_substitution(val: List[str]) -> List[str]:
+    index = random.randint(0, len(val))
+    rchindex = random.randint(0, len(printable))
+    val[index] = printable[rchindex]
+    return val
+
+
+def random_case(val: List[str]) -> List[str]:
+    for elm in range(len(val)):
+        if random.random() > 0.35:
+            val[elm] = val[elm].swapcase()
+    return val
 
 
 class ChessBoardData(D.Dataset):
