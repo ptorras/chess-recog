@@ -1,11 +1,12 @@
-import torch.utils.data as D
 import json
+import random
 import string
-
 from pathlib import Path
-from typing import Dict, Any, List, Tuple, Callable
+from string import ascii_letters, digits, printable
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
+import torch.utils.data as D
 from numpy.typing import ArrayLike
 
 
@@ -45,7 +46,17 @@ def augment_output(val: str) -> str:
 
 SIMILAR = {
     "C": ["(", "c", "/", "["],
+    "d": ["4", "9", "b", "p"],
 }
+
+
+def random_noise(val: str) -> str:
+    if random.random() > 0.5:
+        letters = list(val)
+        for chr in iter(random.sample(ascii_letters)):
+            ...
+    else:
+        return val
 
 
 def similar_elements(val: str) -> str:

@@ -1,8 +1,9 @@
-import chess
 import json
+
+import chess
 import chess.pgn
 
-path_file = "/home/pau/Documents/lichess_db_standard_rated_2013-01.pgn"
+path_file = "/home/ptorras/Documents/Datasets/LichessDatabase/lichess_db_standard_rated_2013-01.pgn"
 
 begin_seq = "[Termination"
 
@@ -41,7 +42,7 @@ with open(path_file, "r") as f:
 
 # play_full = [0]
 data = []
-with open("/home/pau/Documents/data_full.json", "w") as f:
+with open("/home/ptorras/Documents/Datasets/LichessDatabase/data_full.json", "w") as f:
     with open(path_file) as pgn:
         for i in range(len(play_full)):
             #         for i in range(1):
