@@ -14,7 +14,7 @@ import torch
 def create_model():
     model_config = GPT.get_default_config()
     model_config.model_type = "gpt-mini"
-    model_config.vocab_size = Vocab.length()
+    model_config.vocab_size = Vocab.length() + 10
     model_config.block_size = 1024
     model = GPT(model_config)
 
