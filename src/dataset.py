@@ -64,7 +64,7 @@ def similar_elements(val: List[str]) -> List[str]:
 
 def random_insert(val: List[str]) -> List[str]:
     index = random.randint(0, len(val))
-    rchindex = random.randint(0, len(printable))
+    rchindex = random.randint(0, len(printable) - 1)
     randchar = printable[rchindex]
     val.insert(index, randchar)
     return val
@@ -72,7 +72,7 @@ def random_insert(val: List[str]) -> List[str]:
 
 def random_substitution(val: List[str]) -> List[str]:
     index = random.randint(0, len(val) - 1)
-    rchindex = random.randint(0, len(printable))
+    rchindex = random.randint(0, len(printable) - 1)
     val[index] = printable[rchindex]
     return val
 
