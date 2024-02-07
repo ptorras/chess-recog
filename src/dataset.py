@@ -91,7 +91,7 @@ def random_case(val: List[str]) -> List[str]:
 
 
 def random_remove(val: List[str]) -> List[str]:
-    if len(val) > 0:
+    if len(val) > 1:
         index = random.randint(0, len(val) - 1)
         del val[index]
     return val
