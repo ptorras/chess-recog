@@ -42,12 +42,18 @@ class Vocab:
 
 def augment_output(val: str) -> str:
     values = list(val)
-    if random.random() > 0.5:
-        values = random_insert(values)
-    if random.random() > 0.5:
-        values = random_substitution(values)
-    if random.random() > 0.5:
-        values = random_case(values)
+    while True:
+        if random.random() > 0.5:
+            values = random_insert(values)
+        if random.random() > 0.5:
+            values = random_substitution(values)
+        if random.random() > 0.5:
+            values = random_case(values)
+        if random.random() > 0.75:
+            values = random_remove(values)
+
+        if random.random() > 0.1:
+            break
 
     return "".join(values)
 
@@ -81,6 +87,13 @@ def random_case(val: List[str]) -> List[str]:
     for elm in range(len(val)):
         if random.random() > 0.35:
             val[elm] = val[elm].swapcase()
+    return val
+
+
+def random_remove(val: List[str]) -> List[str]:
+    if len(val) > 0:
+        index = random.randint(0, len(val) - 1)
+        del val[index]
     return val
 
 
